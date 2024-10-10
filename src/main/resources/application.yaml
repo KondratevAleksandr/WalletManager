@@ -1,0 +1,12 @@
+spring:
+  liquibase:
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/WalletManager
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
