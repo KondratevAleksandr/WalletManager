@@ -1,7 +1,9 @@
 package com.example.WalletManager.service;
 
-import com.example.WalletManager.dto.WalletDto;
+import com.example.WalletManager.dto.BalanceOperationDto;
 import com.example.WalletManager.entity.Wallet;
+import com.example.WalletManager.exceprion.InsufficientFundsException;
+import com.example.WalletManager.exceprion.WalletNotFoundException;
 import com.example.WalletManager.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,31 +19,32 @@ public class WalletService {
     private WalletRepository walletRepository;
 
     @Transactional
-    public void performOperation(WalletDto walletDto) {
+    public void performOperation(BalanceOperationDto walletDto) {
         Wallet wallet = walletRepository.findByWalletId(walletDto.getWalletId());
+
         if (wallet == null) {
-            throw new IllegalArgumentException("Wallet not found");
+            throw new WalletNotFoundException("Wallet not found");
         }
 
-        switch (walletDto.getOperationType()) {
-            case DEPOSIT:
-                wallet.setBalance(wallet.getBalance().add(walletDto.getAmount()));
-                break;
-            case WITHDRAW:
+        switch (walletDto.getType()) {
+            case DEPOSIT -> wallet.setBalance(wallet.getBalance().add(walletDto.getAmount()));
+            case WITHDRAW -> {
+
                 if (wallet.getBalance().compareTo(walletDto.getAmount()) < 0) {
-                    throw new IllegalArgumentException("Insufficient founds");
+                    throw new InsufficientFundsException("Insufficient founds");
                 }
                 wallet.setBalance(wallet.getBalance().subtract(walletDto.getAmount()));
-                break;
+            }
         }
 
         walletRepository.save(wallet);
     }
 
     public BigDecimal getBalance(UUID walletId) {
-        Wallet wallet = walletRepository.findByWalletId(walletId);
+        Wallet wallet = walletRepository.readByWalletId(walletId);
+
         if (wallet == null) {
-            throw new IllegalArgumentException("Wallet not found");
+            throw new WalletNotFoundException("Wallet not found");
         }
         return wallet.getBalance();
     }

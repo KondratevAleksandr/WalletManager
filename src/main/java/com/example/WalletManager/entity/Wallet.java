@@ -1,13 +1,11 @@
 package com.example.WalletManager.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Data
 public class Wallet {
 
     @Id
@@ -20,4 +18,27 @@ public class Wallet {
     @Column(name = "balance")
     private BigDecimal balance;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public UUID getWalletId() {
+        return walletId;
+    }
+
+    public void setWalletId(UUID walletId) {
+        this.walletId = walletId;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
 }

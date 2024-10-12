@@ -1,13 +1,11 @@
 package com.example.WalletManager.controller;
 
 import com.example.WalletManager.dto.ApiResponse;
-import com.example.WalletManager.dto.WalletDto;
+import com.example.WalletManager.dto.BalanceOperationDto;
 import com.example.WalletManager.entity.Wallet;
 import com.example.WalletManager.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -21,39 +19,20 @@ public class WalletController {
     private WalletService walletService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse> performOperation(@RequestBody WalletDto walletDto) {
-        try {
-            walletService.performOperation(walletDto);
-            return ResponseEntity.ok(new ApiResponse("Operation completed successfully", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), false));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("An unexpected error occurred", false));
-        }
+    public ApiResponse performOperation(@Validated @RequestBody BalanceOperationDto walletDto) {
+        walletService.performOperation(walletDto);
+        return new ApiResponse("Operation completed successfully", true);
     }
 
     @GetMapping("/wallets/{walletId}")
-    public ResponseEntity<ApiResponse> getBalance(@PathVariable UUID walletId) {
+    public ApiResponse getBalance(@PathVariable UUID walletId) {
         BigDecimal balance = walletService.getBalance(walletId);
-        if (balance == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Wallet not found", false));
-        }
-        return ResponseEntity.ok(new ApiResponse("Balance for wallet " + walletId + " is " + balance, true));
+        return new ApiResponse("Balance for wallet " + walletId + " is " + balance, true);
     }
 
     @GetMapping("/create")
-    public ResponseEntity<ApiResponse> createWallet() {
+    public ApiResponse createWallet() {
         Wallet wallet = walletService.createWallet();
-        return ResponseEntity.ok(new ApiResponse("Wallet created with ID: " + wallet.getWalletId(), true));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Invalid request format", false));
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleGlobalExceptions(Exception ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("An unexpected error", false));
+        return new ApiResponse("Wallet created with ID: " + wallet.getWalletId(), true);
     }
 }

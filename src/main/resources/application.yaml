@@ -1,12 +1,12 @@
 spring:
   liquibase:
     enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
   datasource:
-    url: jdbc:postgresql://localhost:5432/WalletManager
-    username: user
-    password: password
+    url: jdbc:postgresql://localhost:5432/${DB_NAME:WalletManager}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:password}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-
