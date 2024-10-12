@@ -18,7 +18,6 @@ public class BalanceOperationDto {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "operation_type")
     private OperationType type;
 
     @NotNull
